@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Distributed Sensor Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>📡Sistem Distribuit</h1>
+<nav class="nav">
+    <a href="/" class="btn">📋 Table</a>
+    <a href="/chart" class="btn active">📈 Charts</a>
+</nav>
+
+<div class="filters">
+    <label>Node:</label>
+    <select id="nodeFilter">
+        <option value="">All</option>
+        <option value="master">master</option>
+        <option value="node1">node1</option>
+    </select>
+
+    <label>Sensor:</label>
+    <select id="sensorFilter">
+        <option value="">All</option>
+        <option value="dht22">dht22</option>
+        <option value="apds">apds</option>
+        <option value="bmp280">bmp280</option>
+        <option value="aht21">aht21</option>
+        <option value="gas">gas</option>
+    </select>
+</div>
+
+<table id="data-table">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Node</th>
+            <th>Sensor</th>
+            <th>Metric</th>
+            <th>Value</th>
+            <th>Unit</th>
+            <th>Quality</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for r in rows %}
+        <tr data-node="{{ r.node }}" data-sensor="{{ r.sensor }}">
+            <td>{{ r.timestamp }}</td>
+
+            <td class="{% if r.node == 'master' %}node-master{% else %}node-node{% endif %}">
+                {{ r.node }}
+            </td>
+
+            <td>{{ r.sensor }}</td>
+            <td>{{ r.metric }}</td>
+            <td>{{ "%.2f"|format(r.value) }}</td>
+            <td>{{ r.unit }}</td>
+
+            <td class="
+                {% if r.quality == 'GOOD' %}good
+                {% elif r.quality == 'MODERAT' %}moderate
+                {% elif r.quality == 'BAD' %}bad
+                {% endif %}
+            ">
+                {{ r.quality or "" }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensor Charts</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<h1>📈 Sensor Charts</h1>
+<nav class="nav">
+    <a href="/" class="btn">📋 Table</a>
+    <a href="/chart" class="btn active">📈 Charts</a>
+</nav>
+
+
+<div class="chart-grid">
+    {% for name, points in series.items() %}
+        <div class="chart-card">
+            <h3>{{ name }}</h3>
+            <canvas id="chart_{{ loop.index }}"></canvas>
+
+            <script>
+                window.chartData = window.chartData || [];
+                window.chartData.push({
+                    id: "chart_{{ loop.index }}",
+                    label: "{{ name }}",
+                    data: {{ points | tojson }}
+                });
+            </script>
+        </div>
+    {% endfor %}
+</div>
+
+
+<div class="chart-card wide">
+    <h3>Parametrii node1</h3>
+    <canvas id="comboChart"></canvas>
+
+    <script>
+        new Chart(document.getElementById("comboChart"), {
+            type: "line",
+            data: {
+                labels: {{ labels | tojson }},
+                datasets: [
+                    {
+                        label: "Temperature (°C)",
+                        data: {{ temp | tojson }},
+                        borderColor: "red",
+                        tension: 0.2
+                    },
+                    {
+                        label: "Humidity (%)",
+                        data: {{ hum | tojson }},
+                        borderColor: "blue",
+                        tension: 0.2
+                    },
+                    {
+                        label: "Pressure (hPa)",
+                        data: {{pressure | tojson }},
+                        borderColor: "green"
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: { color: "#e5e7eb" }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: "#cbd5f5" } },
+                    y: { ticks: { color: "#cbd5f5" } }
+                }
+            }
+        });
+    </script>
+</div>
+
+
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
+</body>
+</html>
